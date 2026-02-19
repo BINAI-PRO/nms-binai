@@ -38,7 +38,7 @@ export default function HomePage() {
           </div>
         </div>
         <Link
-          href="/app/notifications"
+          href="/user/notifications"
           className="relative rounded-full p-2 text-[var(--primary)] hover:bg-[var(--primary)]/5"
         >
           <BadgeCheck size={22} />
@@ -68,7 +68,7 @@ export default function HomePage() {
       <QuickActions />
 
       <section className="space-y-3">
-        <Header title="Incidencias recientes" href="/app/incidents" />
+        <Header title="Incidencias recientes" href="/user/incidents" />
         <div className="grid gap-3">
           {mockIncidents.map((incident) => (
             <article key={incident.id} className="card p-4">
@@ -98,7 +98,7 @@ export default function HomePage() {
       </section>
 
       <section className="space-y-3">
-        <Header title="Próximas reservas" href="/app/bookings" />
+        <Header title="Próximas reservas" href="/user/bookings" />
         <div className="grid gap-3 sm:grid-cols-2">
           {mockFacilities.map((facility) => (
             <article key={facility.id} className="card p-4">
@@ -122,7 +122,7 @@ export default function HomePage() {
       </section>
 
       <section className="space-y-3">
-        <Header title="Movimientos de billetera" href="/app/wallet" />
+        <Header title="Movimientos de billetera" href="/user/wallet" />
         <div className="grid gap-3">
           {mockTransactions.map((tx) => (
             <div
@@ -155,7 +155,7 @@ export default function HomePage() {
       </section>
 
       <section className="space-y-3">
-        <Header title="Comunidad" href="/app/community" />
+        <Header title="Comunidad" href="/user/community" />
         <div className="grid gap-3">
           {mockAnnouncements.map((a) => (
             <article key={a.id} className="card overflow-hidden">
@@ -187,9 +187,9 @@ function QuickActions() {
   return (
     <section className="grid grid-cols-3 gap-3">
       {[
-        { label: "Reportar", icon: Camera, href: "/app/incidents/new" },
-        { label: "Reservar", icon: TicketCheck, href: "/app/bookings/facilities" },
-        { label: "Comentar", icon: MessageCircle, href: "/app/community" },
+        { label: "Reportar", icon: Camera, href: "/user/incidents/new" },
+        { label: "Reservar", icon: TicketCheck, href: "/user/bookings/facilities" },
+        { label: "Comentar", icon: MessageCircle, href: "/user/community" },
       ].map((action) => (
         <Link
           href={action.href}

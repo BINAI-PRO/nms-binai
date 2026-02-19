@@ -6,7 +6,7 @@ export default async function AdminAccessPage() {
     return (
       <section className="card space-y-2 p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
-          Admin · access
+          Admin - access
         </p>
         <h2 className="text-lg font-bold text-[var(--foreground)]">Configuracion pendiente</h2>
         <p className="text-sm text-[var(--muted)]">
@@ -28,7 +28,7 @@ export default async function AdminAccessPage() {
     return (
       <section className="card space-y-2 p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
-          Admin · access
+          Admin - access
         </p>
         <h2 className="text-lg font-bold text-[var(--foreground)]">No se pudo cargar accesos</h2>
         <p className="text-sm text-[var(--muted)]">

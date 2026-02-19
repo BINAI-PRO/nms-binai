@@ -13,7 +13,7 @@ export default function Page() {
           <h1 className="text-xl font-bold text-[var(--foreground)]">Seguimiento</h1>
         </div>
         <Link
-          href="/app/incidents/new"
+          href="/user/incidents/new"
           className="rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow hover:opacity-90"
         >
           Reportar
@@ -23,7 +23,7 @@ export default function Page() {
       <div className="grid gap-3">
         {mockIncidents.map((incident) => (
           <Link
-            href={`/app/incidents/${incident.id}`}
+            href={`/user/incidents/${incident.id}`}
             key={incident.id}
             className="card block p-4 hover:border-[var(--primary)]"
           >

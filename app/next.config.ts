@@ -5,6 +5,14 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  async rewrites() {
+    return [
+      {
+        source: "/user/:path*",
+        destination: "/app/:path*",
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

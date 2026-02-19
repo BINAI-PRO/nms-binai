@@ -3,7 +3,7 @@
 Plataforma para comunidad residencial en `Next.js` con:
 - app de residentes (`/app/*`)
 - panel admin (`/admin/*`)
-- APIs internas (auth local, accesos QR, Stripe, Drive, auth bridge)
+- APIs internas (Supabase Auth, accesos QR, Stripe, Drive, auth bridge)
 - modelo de datos Supabase
 
 La app activa vive en `app/`.
@@ -25,17 +25,17 @@ Rutas:
 - `http://127.0.0.1:3000/app/home`
 - `http://127.0.0.1:3000/admin/dashboard`
 
-## Login simple (temporal)
+## Login por correo/password (Supabase Auth)
 
-Se habilito login local por `usuario/password`:
-- API: `POST /api/auth/local-login`
-- Logout: `POST /api/auth/local-logout`
-- Cookies: `binai_session`, `binai_role`, `binai_user`
-- Middleware protege `/app/*` y `/admin/*`
+Se habilito login con correo/password contra Supabase Auth usando NextAuth:
+- Provider: `supabase-password`
+- Ruta de login: `/sign-in`
+- Proteccion de rutas por token JWT de NextAuth (`/app/*`, `/admin/*`)
 
-Credenciales configurables en `app/.env.local`:
-- `LOCAL_ADMIN_USER` / `LOCAL_ADMIN_PASS`
-- `LOCAL_RESIDENT_USER` / `LOCAL_RESIDENT_PASS`
+Requisitos:
+- Usuario creado en **Supabase Auth** (email/password)
+- Registro en tabla `users` y membresia en `memberships` (se hace upsert al iniciar sesion)
+- Rol `admin` o `staff` en `memberships` para entrar a `/admin/*`
 
 ## Modulo de accesos QR/token
 

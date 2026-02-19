@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 const PUBLIC_ROUTES = new Set(["/", "/sign-in", "/sign-up", "/callback"]);
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
@@ -18,21 +19,24 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = request.cookies.get("binai_session")?.value;
-  const role = request.cookies.get("binai_role")?.value;
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
   if (pathname.startsWith("/admin")) {
-    if (session === "1" && role === "admin") {
-      return NextResponse.next();
+    const role = (token?.role as string | undefined) ?? "";
+    if (!token || (role !== "admin" && role !== "staff")) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
     }
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.next();
   }
 
-  if (pathname.startsWith("/app")) {
-    if (session === "1" && (role === "admin" || role === "resident")) {
-      return NextResponse.next();
+  if (pathname.startsWith("/app") || pathname.startsWith("/user")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
     }
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.next();
   }
 
   return NextResponse.next();

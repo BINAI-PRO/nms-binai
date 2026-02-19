@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { AppShell } from "./shell";
 
 export const metadata: Metadata = {
-  title: "App · Bisalom",
+  title: "User App - Bisalom",
 };
 
 export default function Layout({ children }: { children: ReactNode }) {

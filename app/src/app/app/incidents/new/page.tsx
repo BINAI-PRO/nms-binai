@@ -9,7 +9,7 @@ export default function Page() {
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Incidencia</p>
           <h1 className="text-xl font-bold text-[var(--foreground)]">Reportar problema</h1>
         </div>
-        <Link href="/app/incidents" className="text-sm font-semibold text-[var(--primary)]">Volver</Link>
+        <Link href="/user/incidents" className="text-sm font-semibold text-[var(--primary)]">Volver</Link>
       </div>
 
       <form className="space-y-4 card p-4">

@@ -4,7 +4,7 @@ export default function CallbackPage() {
       <div className="card w-full max-w-md space-y-4 p-6 text-center">
         <h1 className="text-lg font-bold text-[var(--foreground)]">Callback no activo</h1>
         <p className="text-sm text-[var(--muted)]">
-          El proyecto esta usando login local temporal. Regresa a /sign-in para entrar con usuario y password.
+          Este flujo de callback no esta en uso. Inicia sesion desde /sign-in con correo y password de Supabase Auth.
         </p>
       </div>
     </main>

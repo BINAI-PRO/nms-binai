@@ -6,11 +6,11 @@ export default function Page() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-[var(--foreground)]">Instalaciones</h1>
-        <Link href="/app/bookings" className="text-sm font-semibold text-[var(--primary)]">Mis reservas</Link>
+        <Link href="/user/bookings" className="text-sm font-semibold text-[var(--primary)]">Mis reservas</Link>
       </div>
       <div className="grid gap-3">
         {mockFacilities.map((facility) => (
-          <Link key={facility.id} href={`/app/bookings/facilities/${facility.id}`} className="card block p-4 hover:border-[var(--primary)]">
+          <Link key={facility.id} href={`/user/bookings/facilities/${facility.id}`} className="card block p-4 hover:border-[var(--primary)]">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{facility.type}</p>

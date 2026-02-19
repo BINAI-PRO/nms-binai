@@ -9,7 +9,7 @@ export default function Page() {
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Reservas</p>
           <h1 className="text-xl font-bold text-[var(--foreground)]">Próximas</h1>
         </div>
-        <Link href="/app/bookings/facilities" className="text-sm font-semibold text-[var(--primary)]">Ver instalaciones</Link>
+        <Link href="/user/bookings/facilities" className="text-sm font-semibold text-[var(--primary)]">Ver instalaciones</Link>
       </div>
 
       <div className="grid gap-3">

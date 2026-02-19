@@ -1,5 +1,6 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
 import { getFirebaseAuth } from "@/lib/firebase-admin";
 import { upsertUserAndMemberships, type SessionUser } from "@/lib/auth/supabase-users";
@@ -17,6 +18,43 @@ const authOptions: NextAuthOptions = {
   secret: env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   providers: [
+    CredentialsProvider({
+      id: "supabase-password",
+      name: "Supabase Email/Password",
+      credentials: {
+        email: { label: "Correo", type: "email" },
+        password: { label: "Password", type: "password" },
+        communityId: { label: "Community", type: "text" },
+      },
+      async authorize(credentials) {
+        const email = credentials?.email?.trim();
+        const password = credentials?.password;
+        if (!email || !password) return null;
+        if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return null;
+
+        const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+
+        const authRes = await supabase.auth.signInWithPassword({ email, password });
+        if (authRes.error || !authRes.data.user) return null;
+
+        const user = authRes.data.user;
+        const userName =
+          (user.user_metadata?.full_name as string | undefined) ??
+          (user.user_metadata?.name as string | undefined) ??
+          null;
+
+        const sessionUser = await upsertUserAndMemberships({
+          uid: user.id,
+          email: user.email ?? email,
+          name: userName,
+          communityId: credentials?.communityId ?? null,
+        });
+
+        return sessionUser;
+      },
+    }),
     CredentialsProvider({
       id: "firebase-bridge",
       name: "Firebase Bridge",

@@ -18,12 +18,13 @@ const METRICS: MetricCard[] = [
 
 const ADMIN_LINKS = [
   { href: "/admin/access", label: "Control de accesos" },
+  { href: "/admin/clients", label: "Clientes y roles" },
+  { href: "/admin/availability", label: "Disponibilidad de areas" },
+  { href: "/admin/suppliers", label: "Proveedores" },
   { href: "/admin/incidents", label: "Incidencias" },
   { href: "/admin/bookings", label: "Reservas" },
   { href: "/admin/payments", label: "Pagos" },
-  { href: "/admin/documents", label: "Documentos" },
-  { href: "/admin/groups", label: "Grupos y foros" },
-  { href: "/admin/settings", label: "Configuracion" },
+  { href: "/admin/reports", label: "Reportes" },
 ];
 
 async function tableCount(table: string) {
@@ -38,7 +39,7 @@ export default async function AdminDashboardPage() {
     return (
       <section className="card space-y-2 p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
-          Admin · dashboard
+          Admin - dashboard
         </p>
         <h2 className="text-lg font-bold text-[var(--foreground)]">Configuracion pendiente</h2>
         <p className="text-sm text-[var(--muted)]">
@@ -59,18 +60,21 @@ export default async function AdminDashboardPage() {
     <section className="space-y-4">
       <header className="card space-y-2 p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
-          Admin · dashboard
+          Admin - dashboard
         </p>
         <h2 className="text-lg font-bold text-[var(--foreground)]">Centro de control NMS BInAI</h2>
         <p className="text-sm text-[var(--muted)]">
-          Vista operativa central para administrar comunidad, accesos, incidencias, reservas, pagos y documentos.
+          Vista operativa central para administrar comunidad, accesos, incidencias, reservas, pagos y
+          documentos.
         </p>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {metrics.map((item) => (
           <article key={item.table} className="card p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{item.label}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
+              {item.label}
+            </p>
             <p className="mt-1 text-2xl font-bold text-[var(--foreground)]">
               {item.value === null ? "--" : item.value}
             </p>

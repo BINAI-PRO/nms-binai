@@ -21,11 +21,11 @@ Estado actual del proyecto migrado a `Next.js` con prioridad en despliegue Verce
 - Backend app interno: routes en `app/src/app/api/*`.
 - Base de datos: migraciones en `app/supabase/migrations/*`.
 - Seguridad: RLS habilitado + politicas por membresia.
-- Auth temporal: login local con cookie de sesion para `/app/*` y `/admin/*`.
+- Auth activo: Supabase Auth (email/password) integrado con NextAuth para proteger `/app/*` y `/admin/*`.
 
 ## Secuencia recomendada
 
-1. Endurecer autenticacion y sesion (migrar de login local a flujo real).
+1. Endurecer autenticacion y sesion (MFA, bloqueo por intentos, recuperacion de cuenta).
 2. Conectar todos los modulos UI con Supabase real (no mock).
 3. Completar reglas de negocio (reservas, accesos, pagos, auditoria).
 4. Activar notificaciones push/email y trazabilidad completa.

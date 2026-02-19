@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Copy, History, Loader2, QrCode } from "lucide-react";
 
@@ -210,11 +211,11 @@ export default function AccessPassesPage() {
         <section className="card space-y-3 p-4">
           <h2 className="text-base font-bold text-[var(--foreground)]">Ultimo pase generado</h2>
           <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-[var(--border)] px-4 py-5 text-center">
-            <img
-              src={createdPass.qr_image_url}
+            <Image src={createdPass.qr_image_url}
               alt="QR de acceso"
               width={220}
               height={220}
+              unoptimized
               className="rounded-xl border border-slate-200 bg-white p-2"
             />
             <p className="text-sm font-semibold text-[var(--foreground)]">{createdPass.label}</p>
