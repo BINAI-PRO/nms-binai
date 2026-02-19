@@ -1,0 +1,7 @@
+{
+  "name": "Bisalom Community OS",
+  "description": "A minimalist, mobile-first community management suite for residents to manage incidents, bookings, and payments.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

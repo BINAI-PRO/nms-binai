@@ -1,0 +1,14 @@
+{
+  "nav.home": "Inicio",
+  "nav.incidents": "Incidencias",
+  "nav.bookings": "Reservas",
+  "nav.community": "Comunidad",
+  "nav.wallet": "Billetera",
+  "nav.more": "Más",
+  "app.title": "Bisalom Comunidad",
+  "app.tagline": "Gestión integral de tu comunidad residencial",
+  "cta.enter": "Entrar a la aplicación",
+  "cta.admin": "Consola de administración",
+  "status.online": "En línea",
+  "welcome": "Bienvenido"
+}
