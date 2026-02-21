@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #153b42;
+  --muted: #4c7379;
+  --border: #d4eae9;
+  --card: #ffffff;
+  --primary: #1c5c66;
+  --primary-accent: #69c9c7;
+  --success: #39a082;
+  --warning: #f59e0b;
+  --danger: #e11d48;
+  --radius-lg: 18px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-accent: var(--primary-accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-bisalom-sans);
+  --font-mono: var(--font-bisalom-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-bisalom-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 30px rgba(12, 23, 52, 0.04);
+}
+
+.chip {
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #ecfeff;
+  color: var(--primary);
+}

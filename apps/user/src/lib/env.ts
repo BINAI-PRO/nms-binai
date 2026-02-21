@@ -1,0 +1,12 @@
+export const env = {
+  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ?? "insecure-dev-secret",
+  NEXT_PUBLIC_APP_BASE_URL: process.env.NEXT_PUBLIC_APP_BASE_URL ?? "http://localhost:3000",
+  NEXT_PUBLIC_TENANT_ID: process.env.NEXT_PUBLIC_TENANT_ID ?? "bisalom",
+  NEXT_PUBLIC_USER_BRANDING_MODE: process.env.NEXT_PUBLIC_USER_BRANDING_MODE ?? "community",
+  NEXT_PUBLIC_COMMUNITY_BRANDING_JSON: process.env.NEXT_PUBLIC_COMMUNITY_BRANDING_JSON ?? "",
+  SUPABASE_URL: process.env.SUPABASE_URL ?? "",
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ?? "",
+  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ?? "",
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? "",
+};

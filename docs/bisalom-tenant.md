@@ -2,7 +2,7 @@
 
 ## Activos de marca
 
-- Logo y favicons: `app/public/bisalom`
+- Logo y favicons: `apps/user/public/bisalom` y `apps/admin/public/bisalom`
 - Colores base:
   - `#69C9C7` (primary accent)
   - `#1C5C66` (primary)
@@ -11,14 +11,14 @@
 
 ## Env local del tenant
 
-- Plantilla versionable: `app/tenants/bisalom/env.local.example`
-- Archivo local (no versionado): `app/.env.local.bisalom`
-- Comunidad seed: `f7fd88d8-64bd-4fa1-b5a0-bf96038fef62` (migracion `app/supabase/migrations/0003_seed_bisalom_tenant.sql`)
+- Plantilla versionable: `apps/user/tenants/bisalom/env.local.example`
+- Archivo local (no versionado): `apps/user/.env.local.bisalom`
+- Comunidad seed: `f7fd88d8-64bd-4fa1-b5a0-bf96038fef62` (migracion `apps/user/supabase/migrations/0003_seed_bisalom_tenant.sql`)
 
 Para activarlo:
 
 ```powershell
-Copy-Item app/.env.local.bisalom app/.env.local
+Copy-Item apps/user/.env.local.bisalom apps/user/.env.local
 ```
 
 ## Modo de branding de user app

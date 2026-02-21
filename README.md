@@ -1,12 +1,11 @@
 # BInAI Community OS (Next.js)
 
-Plataforma para comunidad residencial en `Next.js` con:
-- app de residentes (`/app/*`)
-- panel admin (`/admin/*`)
-- APIs internas (Supabase Auth, accesos QR, Stripe, Drive, auth bridge)
-- modelo de datos Supabase
+Proyecto separado en dos aplicaciones independientes:
 
-La app activa vive en `app/`.
+- `apps/user`: app para residentes.
+- `apps/admin`: app para administradores.
+
+Ambas apps comparten el mismo modelo de datos y API interna, pero se ejecutan y despliegan por separado.
 
 ## Correr en local
 
@@ -14,61 +13,48 @@ Requisitos:
 - Node.js 20+
 - npm 10+
 
-Comandos:
+Instalar dependencias:
 ```bash
-npm run install:app
-npm run dev
+npm run install:apps
 ```
 
-Rutas:
-- `http://127.0.0.1:3000/sign-in`
-- `http://127.0.0.1:3000/app/home`
-- `http://127.0.0.1:3000/admin/dashboard`
+Desarrollo:
+```bash
+npm run dev:user
+npm run dev:admin
+```
+
+Rutas por defecto:
+- User app: `http://127.0.0.1:3000/sign-in`
+- Admin app: `http://127.0.0.1:3001/sign-in`
+
+## Build y start
+
+```bash
+npm run build:all
+npm run start:user
+npm run start:admin
+```
 
 ## Login por correo/password (Supabase Auth)
 
-Se habilito login con correo/password contra Supabase Auth usando NextAuth:
 - Provider: `supabase-password`
-- Ruta de login: `/sign-in`
-- Proteccion de rutas por token JWT de NextAuth (`/app/*`, `/admin/*`)
-
-Requisitos:
-- Usuario creado en **Supabase Auth** (email/password)
-- Registro en tabla `users` y membresia en `memberships` (se hace upsert al iniciar sesion)
-- Rol `admin` o `staff` en `memberships` para entrar a `/admin/*`
-
-## Modulo de accesos QR/token
-
-Incluye:
-- Generacion de pases para `visitor` y `service` desde `app/passes`
-- Token + QR
-- Historial de pases
-- Control admin para revocar/reactivar desde `admin/access`
-
-APIs:
-- `GET /api/access/passes`
-- `POST /api/access/passes`
-- `PATCH /api/access/passes/[id]`
+- Login en `/sign-in` dentro de cada app
+- User app permite roles de usuario final
+- Admin app permite solo roles `admin` o `staff`
 
 ## Migraciones Supabase
 
 Ejecutar en orden:
-1. `app/supabase/migrations/0001_init.sql`
-2. `app/supabase/migrations/0002_access_passes.sql`
-
-## Produccion local
-
-```bash
-npm run build
-npm run start
-```
+1. `apps/user/supabase/migrations/0001_init.sql`
+2. `apps/user/supabase/migrations/0002_access_passes.sql`
 
 ## Deploy en Vercel
 
-1. Importar repo en Vercel.
-2. Configurar `Root Directory = app`.
-3. Cargar variables de `app/.env.local` en Vercel.
-4. Deploy.
+Configurar un proyecto por app:
+1. User app con `Root Directory = apps/user`
+2. Admin app con `Root Directory = apps/admin`
+3. Variables de entorno segun su `.env.example`
 
 ## Cobertura funcional
 

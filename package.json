@@ -3,10 +3,22 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "npm --prefix app run dev",
-    "build": "npm --prefix app run build",
-    "start": "npm --prefix app run start",
-    "lint": "npm --prefix app run lint",
-    "install:app": "npm --prefix app install"
+    "dev": "npm run dev:user",
+    "dev:user": "npm --prefix apps/user run dev",
+    "dev:admin": "npm --prefix apps/admin run dev",
+    "build": "npm run build:user",
+    "build:user": "npm --prefix apps/user run build",
+    "build:admin": "npm --prefix apps/admin run build",
+    "build:all": "npm run build:user && npm run build:admin",
+    "start": "npm run start:user",
+    "start:user": "npm --prefix apps/user run start",
+    "start:admin": "npm --prefix apps/admin run start",
+    "lint": "npm run lint:user && npm run lint:admin",
+    "lint:user": "npm --prefix apps/user run lint",
+    "lint:admin": "npm --prefix apps/admin run lint",
+    "install:user": "npm --prefix apps/user install",
+    "install:admin": "npm --prefix apps/admin install",
+    "install:apps": "npm run install:user && npm run install:admin",
+    "install:app": "npm run install:apps"
   }
 }

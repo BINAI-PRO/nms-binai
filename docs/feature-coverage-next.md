@@ -17,11 +17,11 @@ Estado actual del proyecto migrado a `Next.js` con prioridad en despliegue Verce
 
 ## Estado tecnico de plataforma
 
-- Frontend activo: `Next.js app router` en `app/`.
-- Backend app interno: routes en `app/src/app/api/*`.
-- Base de datos: migraciones en `app/supabase/migrations/*`.
+- Frontend activo: `Next.js app router` en `apps/user` y `apps/admin`.
+- Backend app interno: routes en `apps/*/src/app/api/*`.
+- Base de datos: migraciones en `apps/user/supabase/migrations/*` (replicables a `apps/admin`).
 - Seguridad: RLS habilitado + politicas por membresia.
-- Auth activo: Supabase Auth (email/password) integrado con NextAuth para proteger `/app/*` y `/admin/*`.
+- Auth activo: Supabase Auth (email/password) integrado con NextAuth para proteger cada app por rol.
 
 ## Secuencia recomendada
 
