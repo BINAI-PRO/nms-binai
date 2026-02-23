@@ -96,7 +96,7 @@ export default function SignInPage() {
               />
             </div>
             <h1 className="text-xl font-bold text-[var(--foreground)]">Acceso seguro</h1>
-            <p className="text-sm text-[var(--muted)]">Ingresa con correo y password registrados en Supabase.</p>
+            <p className="text-sm text-[var(--muted)]">Ingresa con correo y password registrados.</p>
           </header>
 
           <form onSubmit={onSubmit} className="space-y-4">

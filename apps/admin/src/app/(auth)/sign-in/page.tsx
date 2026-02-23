@@ -78,7 +78,7 @@ export default function SignInPage() {
           </p>
           <h1 className="text-xl font-bold text-[var(--foreground)]">Acceso por Supabase Auth</h1>
           <p className="text-sm text-[var(--muted)]">
-            Ingresa con correo y password registrados en Supabase.
+            Ingresa con correo y password registrados.
           </p>
         </header>
 
