@@ -25,6 +25,11 @@ const bisalomMono = JetBrains_Mono({
 
 const tenantBranding = getActiveTenantBranding();
 const userBranding = getEffectiveUserBranding();
+const socialPreviewImage =
+  userBranding.assets.socialImageContrast ??
+  userBranding.assets.socialImage ??
+  userBranding.assets.logoContrast ??
+  userBranding.assets.logo;
 const metadataBase = (() => {
   try {
     return new URL(env.NEXT_PUBLIC_APP_BASE_URL);
@@ -39,11 +44,45 @@ export const metadata: Metadata = {
   metadataBase,
   icons: {
     icon: [
-      { url: userBranding.assets.faviconIco },
-      { url: userBranding.assets.favicon16, type: "image/png", sizes: "16x16" },
-      { url: userBranding.assets.favicon32, type: "image/png", sizes: "32x32" },
+      { url: userBranding.assets.faviconIcoContrast ?? userBranding.assets.faviconIco },
+      {
+        url: userBranding.assets.favicon16Contrast ?? userBranding.assets.favicon16,
+        type: "image/png",
+        sizes: "16x16",
+      },
+      {
+        url: userBranding.assets.favicon32Contrast ?? userBranding.assets.favicon32,
+        type: "image/png",
+        sizes: "32x32",
+      },
     ],
-    apple: [{ url: userBranding.assets.appleTouchIcon, type: "image/png", sizes: "180x180" }],
+    apple: [
+      {
+        url: userBranding.assets.appleTouchIconContrast ?? userBranding.assets.appleTouchIcon,
+        type: "image/png",
+        sizes: "180x180",
+      },
+    ],
+  },
+  openGraph: {
+    title: `${userBranding.displayName} | App Residentes`,
+    description: tenantBranding.platformDescription,
+    images: [
+      {
+        url: socialPreviewImage,
+        width: 512,
+        height: 512,
+        alt: `Imagen de ${userBranding.displayName}`,
+      },
+    ],
+    locale: "es_MX",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${userBranding.displayName} | App Residentes`,
+    description: tenantBranding.platformDescription,
+    images: [socialPreviewImage],
   },
   manifest: userBranding.assets.manifest,
 };

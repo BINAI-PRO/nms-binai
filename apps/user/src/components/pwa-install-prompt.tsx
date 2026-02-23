@@ -44,7 +44,7 @@ function shouldSkipPrompt() {
 export function PwaInstallPrompt() {
   const branding = getEffectiveUserBranding();
   const appLabel = branding.displayName || "la app";
-  const iconSrc = branding.assets.logo;
+  const iconSrc = branding.assets.logoContrast ?? branding.assets.logo;
 
   const [variant, setVariant] = useState<PromptVariant>("hidden");
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);

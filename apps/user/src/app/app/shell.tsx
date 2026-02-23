@@ -130,7 +130,7 @@ function PoweredFooter() {
       <div className="mx-auto w-full max-w-md lg:max-w-[920px]">
         <div className="card flex items-center justify-center gap-3 px-4 py-3 text-xs text-[var(--muted)]">
           <Image
-            src={tenantBranding.assets.logo}
+            src={tenantBranding.assets.logoContrast ?? tenantBranding.assets.logo}
             alt={`Logo ${tenantBranding.companyName}`}
             width={176}
             height={48}

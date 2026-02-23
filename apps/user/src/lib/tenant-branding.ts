@@ -18,10 +18,21 @@ export type BrandPalette = {
 
 export type TenantAssets = {
   logo: string;
+  logoContrast?: string;
   favicon16: string;
+  favicon16Contrast?: string;
   favicon32: string;
+  favicon32Contrast?: string;
   faviconIco: string;
+  faviconIcoContrast?: string;
   appleTouchIcon: string;
+  appleTouchIconContrast?: string;
+  android192?: string;
+  android192Contrast?: string;
+  android512?: string;
+  android512Contrast?: string;
+  socialImage?: string;
+  socialImageContrast?: string;
   manifest: string;
 };
 
@@ -98,10 +109,21 @@ const DEFAULT_COMMUNITY_OVERRIDES: ParsedCommunityMap = {
     logo: "/encino/logo.webp",
     assets: {
       logo: "/encino/logo.webp",
+      logoContrast: "/encino/logo_c.png",
       favicon16: "/encino/favicon-16x16.png",
+      favicon16Contrast: "/encino/favicon-16x16_c.png",
       favicon32: "/encino/favicon-32x32.png",
+      favicon32Contrast: "/encino/favicon-32x32_c.png",
       faviconIco: "/encino/favicon.ico",
+      faviconIcoContrast: "/encino/favicon_c.ico",
       appleTouchIcon: "/encino/apple-touch-icon.png",
+      appleTouchIconContrast: "/encino/apple-touch-icon_c.png",
+      android192: "/encino/android-chrome-192x192.png",
+      android192Contrast: "/encino/android-chrome-192x192_c.png",
+      android512: "/encino/android-chrome-512x512.png",
+      android512Contrast: "/encino/android-chrome-512x512_c.png",
+      socialImage: "/encino/android-chrome-512x512.png",
+      socialImageContrast: "/encino/android-chrome-512x512_c.png",
       manifest: "/encino/site.webmanifest",
     },
     palette: {
@@ -183,21 +205,65 @@ function parseCommunityOverrides(rawJson: string | undefined): ParsedCommunityMa
                   typeof typedOverride.assets.logo === "string"
                     ? typedOverride.assets.logo
                     : undefined,
+                logoContrast:
+                  typeof typedOverride.assets.logoContrast === "string"
+                    ? typedOverride.assets.logoContrast
+                    : undefined,
                 favicon16:
                   typeof typedOverride.assets.favicon16 === "string"
                     ? typedOverride.assets.favicon16
+                    : undefined,
+                favicon16Contrast:
+                  typeof typedOverride.assets.favicon16Contrast === "string"
+                    ? typedOverride.assets.favicon16Contrast
                     : undefined,
                 favicon32:
                   typeof typedOverride.assets.favicon32 === "string"
                     ? typedOverride.assets.favicon32
                     : undefined,
+                favicon32Contrast:
+                  typeof typedOverride.assets.favicon32Contrast === "string"
+                    ? typedOverride.assets.favicon32Contrast
+                    : undefined,
                 faviconIco:
                   typeof typedOverride.assets.faviconIco === "string"
                     ? typedOverride.assets.faviconIco
                     : undefined,
+                faviconIcoContrast:
+                  typeof typedOverride.assets.faviconIcoContrast === "string"
+                    ? typedOverride.assets.faviconIcoContrast
+                    : undefined,
                 appleTouchIcon:
                   typeof typedOverride.assets.appleTouchIcon === "string"
                     ? typedOverride.assets.appleTouchIcon
+                    : undefined,
+                appleTouchIconContrast:
+                  typeof typedOverride.assets.appleTouchIconContrast === "string"
+                    ? typedOverride.assets.appleTouchIconContrast
+                    : undefined,
+                android192:
+                  typeof typedOverride.assets.android192 === "string"
+                    ? typedOverride.assets.android192
+                    : undefined,
+                android192Contrast:
+                  typeof typedOverride.assets.android192Contrast === "string"
+                    ? typedOverride.assets.android192Contrast
+                    : undefined,
+                android512:
+                  typeof typedOverride.assets.android512 === "string"
+                    ? typedOverride.assets.android512
+                    : undefined,
+                android512Contrast:
+                  typeof typedOverride.assets.android512Contrast === "string"
+                    ? typedOverride.assets.android512Contrast
+                    : undefined,
+                socialImage:
+                  typeof typedOverride.assets.socialImage === "string"
+                    ? typedOverride.assets.socialImage
+                    : undefined,
+                socialImageContrast:
+                  typeof typedOverride.assets.socialImageContrast === "string"
+                    ? typedOverride.assets.socialImageContrast
                     : undefined,
                 manifest:
                   typeof typedOverride.assets.manifest === "string"
