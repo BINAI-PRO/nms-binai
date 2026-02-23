@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase";
+import { type AccessPassRow, decorateAccessPass } from "@/lib/access-passes";
 import { AdminAccessClient, type AdminAccessPass } from "./page-client";
 
 export default async function AdminAccessPage() {
@@ -19,7 +20,7 @@ export default async function AdminAccessPage() {
   const result = await supabaseAdmin
     .from("access_passes")
     .select(
-      "id,community_id,type,label,token,status,valid_from,valid_until,max_uses,used_count,last_used_at,created_at"
+      "id,community_id,type,label,token,qr_payload,status,valid_from,valid_until,max_uses,used_count,last_used_at,created_at"
     )
     .order("created_at", { ascending: false })
     .limit(200);
@@ -40,7 +41,9 @@ export default async function AdminAccessPage() {
     );
   }
 
-  const initialPasses = (result.data ?? []) as AdminAccessPass[];
+  const initialPasses = (await Promise.all(
+    ((result.data ?? []) as AccessPassRow[]).map((item) => decorateAccessPass(item))
+  )) as AdminAccessPass[];
 
   return <AdminAccessClient initialPasses={initialPasses} />;
 }

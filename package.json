@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "npm run dev:user",
     "dev:user": "npm --prefix apps/user run dev",
+    "dev:mobile": "npm --prefix apps/user run dev:mobile",
     "dev:admin": "npm --prefix apps/admin run dev",
     "build": "npm run build:user",
     "build:user": "npm --prefix apps/user run build",

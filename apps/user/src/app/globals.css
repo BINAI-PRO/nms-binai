@@ -30,7 +30,10 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at 15% -20%, color-mix(in srgb, var(--primary-accent) 35%, transparent), transparent 40%),
+    radial-gradient(circle at 110% 0%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 34%),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-bisalom-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
   min-height: 100vh;
@@ -45,7 +48,7 @@ a {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 12px 30px rgba(12, 23, 52, 0.04);
+  box-shadow: 0 16px 34px rgba(12, 23, 52, 0.08);
 }
 
 .chip {

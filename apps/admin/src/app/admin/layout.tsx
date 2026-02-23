@@ -12,6 +12,7 @@ import {
   CreditCard,
   FileText,
   QrCode,
+  ScanLine,
   Settings,
   ShieldAlert,
   UsersRound,
@@ -29,6 +30,7 @@ type AdminNavItem = {
 const adminNav: AdminNavItem[] = [
   { href: "/admin/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/admin/access", label: "Accesos QR", icon: QrCode },
+  { href: "/admin/guardian", label: "Guardian Caseta", icon: ScanLine },
   { href: "/admin/clients", label: "Clientes", icon: UsersRound },
   { href: "/admin/suppliers", label: "Proveedores", icon: Wrench },
   { href: "/admin/availability", label: "Disponibilidad", icon: CalendarClock },

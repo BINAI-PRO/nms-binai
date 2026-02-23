@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     uid: decoded.uid,
     email,
     name: decoded.name,
-    communityId: parsed.data.communityId ?? null,
+    communityId: parsed.data.communityId ?? process.env.NEXT_PUBLIC_DEFAULT_COMMUNITY_ID?.trim() ?? null,
   });
 
   return NextResponse.json({

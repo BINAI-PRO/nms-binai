@@ -18,6 +18,7 @@ const METRICS: MetricCard[] = [
 
 const ADMIN_LINKS = [
   { href: "/admin/access", label: "Control de accesos" },
+  { href: "/admin/guardian", label: "Guardia de caseta" },
   { href: "/admin/clients", label: "Clientes y roles" },
   { href: "/admin/availability", label: "Disponibilidad de areas" },
   { href: "/admin/suppliers", label: "Proveedores" },

@@ -13,7 +13,7 @@ import {
   Wallet,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { getEffectiveUserBranding, paletteToCssVariables } from "@/lib/tenant-branding";
+import { getActiveTenantBranding, getEffectiveUserBranding, paletteToCssVariables } from "@/lib/tenant-branding";
 
 type NavItem = {
   href: string;
@@ -62,8 +62,8 @@ function BottomNav() {
               <li key={item.href} className="flex flex-col items-center">
                 <Link
                   href={item.href}
-                  className={`flex flex-col items-center gap-1 rounded-md px-2 py-1 transition ${
-                    active ? "text-[var(--primary)]" : "hover:text-[var(--foreground)]"
+                  className={`flex w-full flex-col items-center gap-1 rounded-xl px-2 py-1.5 transition ${
+                    active ? "bg-[var(--primary)]/10 text-[var(--primary)]" : "hover:text-[var(--foreground)]"
                   }`}
                 >
                   <Icon size={18} />
@@ -91,7 +91,7 @@ function DesktopNav() {
             href={item.href}
             className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
               active
-                ? "border-[var(--primary)] bg-[var(--primary)] text-white"
+                ? "border-transparent bg-[var(--primary)] text-white"
                 : "border-[var(--border)] bg-white text-[var(--foreground)] hover:border-[var(--primary)]"
             }`}
           >
@@ -103,15 +103,38 @@ function DesktopNav() {
   );
 }
 
+function PoweredFooter() {
+  const tenantBranding = getActiveTenantBranding();
+
+  return (
+    <footer className="px-3 pb-24 pt-2 lg:px-0 lg:pb-8">
+      <div className="mx-auto w-full max-w-md lg:max-w-[920px]">
+        <div className="card flex items-center justify-center gap-3 px-4 py-3 text-xs text-[var(--muted)]">
+          <Image
+            src={tenantBranding.assets.logo}
+            alt={`Logo ${tenantBranding.companyName}`}
+            width={176}
+            height={48}
+            className="h-10 w-auto opacity-90"
+          />
+          <span>BISALOM Administrador Residencial</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
-  const activeCommunityId =
-    typeof window === "undefined"
-      ? undefined
-      : window.localStorage.getItem("nms_active_community_id")?.trim() || undefined;
-  const userBranding = getEffectiveUserBranding(activeCommunityId);
+  const userBranding = getEffectiveUserBranding();
+  const pathname = usePathname();
+  const normalizedPath = pathname?.startsWith("/app/")
+    ? pathname.replace("/app/", "/user/")
+    : pathname === "/app"
+      ? "/user"
+      : pathname;
+  const showPoweredFooter = !normalizedPath?.startsWith("/user/home");
 
   async function onLogout() {
-    window.localStorage.removeItem("nms_active_community_id");
     await signOut({ callbackUrl: "/sign-in" });
   }
 
@@ -127,17 +150,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Image
                 src={userBranding.logo}
                 alt={`Logo ${userBranding.displayName}`}
-                width={112}
-                height={30}
+                width={132}
+                height={38}
                 priority
-                className="h-7 w-auto"
+                className="h-8 w-auto"
               />
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
-                  User App
-                </p>
-                <h1 className="text-lg font-bold text-[var(--foreground)]">{userBranding.displayName}</h1>
-              </div>
+              <p className="hidden text-sm font-semibold text-[var(--foreground)] sm:block">App Residentes</p>
             </div>
             <button
               type="button"
@@ -158,6 +176,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </main>
       </div>
+      {showPoweredFooter ? <PoweredFooter /> : null}
       <BottomNav />
     </div>
   );

@@ -42,6 +42,7 @@ export type TenantBranding = {
 type CommunityBrandOverride = {
   name?: string;
   logo?: string;
+  assets?: Partial<TenantAssets>;
   palette?: Partial<BrandPalette>;
 };
 
@@ -50,13 +51,13 @@ type ParsedCommunityMap = Record<string, CommunityBrandOverride>;
 const BISALOM: TenantBranding = {
   id: "bisalom",
   companyName: "Bisalom",
-  platformName: "NMS BInAI - Bisalom",
+  platformName: "NMS BInAI - Comunidades",
   platformDescription:
-    "Sistema operativo integral para comunidades residenciales administradas por Bisalom.",
+    "Sistema operativo integral para comunidades residenciales.",
   adminAppName: "Bisalom Admin",
   adminDescription:
     "Control central de desarrollos, comunidades, proveedores, disponibilidades y reportes.",
-  userAppName: "Bisalom Comunidad",
+  userAppName: "Comunidad Residencial",
   userDescription:
     "App de residentes con incidencias, reservas, pagos, documentos y accesos QR.",
   defaultUserBrandMode: "community",
@@ -87,6 +88,77 @@ const TENANTS: Record<string, TenantBranding> = {
   bisalom: BISALOM,
 };
 
+const DEFAULT_COMMUNITY_OVERRIDES: ParsedCommunityMap = {
+  "f7fd88d8-64bd-4fa1-b5a0-bf96038fef62": {
+    name: "Bisalom Hub",
+    logo: "/bisalom/logo.png",
+  },
+  "7c5c828c-f95a-4c31-a5c7-1b338df82001": {
+    name: "Residencial Encino",
+    logo: "/encino/logo.webp",
+    assets: {
+      logo: "/encino/logo.webp",
+      favicon16: "/encino/favicon-16x16.png",
+      favicon32: "/encino/favicon-32x32.png",
+      faviconIco: "/encino/favicon.ico",
+      appleTouchIcon: "/encino/apple-touch-icon.png",
+      manifest: "/encino/site.webmanifest",
+    },
+    palette: {
+      background: "#F4F8F5",
+      foreground: "#1B2A1F",
+      muted: "#5F6E66",
+      border: "#D7E5DB",
+      card: "#FFFFFF",
+      primary: "#1E5A3A",
+      primaryAccent: "#A6D4B8",
+      success: "#2A9D62",
+      warning: "#D08A1F",
+      danger: "#CE4257",
+      radiusLg: "18px",
+    },
+  },
+  "7c5c828c-f95a-4c31-a5c7-1b338df82002": {
+    name: "Valle La Silla",
+    palette: {
+      background: "#F6F7FB",
+      foreground: "#20263A",
+      muted: "#667188",
+      border: "#DEE5F2",
+      card: "#FFFFFF",
+      primary: "#2B4A7F",
+      primaryAccent: "#8FB3F2",
+      success: "#2F9E8A",
+      warning: "#D8A24B",
+      danger: "#D1495B",
+      radiusLg: "18px",
+    },
+  },
+};
+
+function mergeCommunityOverrides(
+  base: ParsedCommunityMap,
+  custom: ParsedCommunityMap
+): ParsedCommunityMap {
+  const merged: ParsedCommunityMap = { ...base };
+  for (const [communityId, override] of Object.entries(custom)) {
+    const current = merged[communityId];
+    merged[communityId] = {
+      ...(current ?? {}),
+      ...override,
+      assets: {
+        ...(current?.assets ?? {}),
+        ...(override.assets ?? {}),
+      },
+      palette: {
+        ...(current?.palette ?? {}),
+        ...(override.palette ?? {}),
+      },
+    };
+  }
+  return merged;
+}
+
 function parseBrandMode(rawValue: string | undefined, fallback: BrandMode): BrandMode {
   if (rawValue === "tenant" || rawValue === "community") return rawValue;
   return fallback;
@@ -104,6 +176,35 @@ function parseCommunityOverrides(rawJson: string | undefined): ParsedCommunityMa
       result[communityId] = {
         name: typeof typedOverride.name === "string" ? typedOverride.name : undefined,
         logo: typeof typedOverride.logo === "string" ? typedOverride.logo : undefined,
+        assets:
+          typedOverride.assets && typeof typedOverride.assets === "object"
+            ? {
+                logo:
+                  typeof typedOverride.assets.logo === "string"
+                    ? typedOverride.assets.logo
+                    : undefined,
+                favicon16:
+                  typeof typedOverride.assets.favicon16 === "string"
+                    ? typedOverride.assets.favicon16
+                    : undefined,
+                favicon32:
+                  typeof typedOverride.assets.favicon32 === "string"
+                    ? typedOverride.assets.favicon32
+                    : undefined,
+                faviconIco:
+                  typeof typedOverride.assets.faviconIco === "string"
+                    ? typedOverride.assets.faviconIco
+                    : undefined,
+                appleTouchIcon:
+                  typeof typedOverride.assets.appleTouchIcon === "string"
+                    ? typedOverride.assets.appleTouchIcon
+                    : undefined,
+                manifest:
+                  typeof typedOverride.assets.manifest === "string"
+                    ? typedOverride.assets.manifest
+                    : undefined,
+              }
+            : undefined,
         palette:
           typedOverride.palette && typeof typedOverride.palette === "object"
             ? typedOverride.palette
@@ -135,6 +236,7 @@ export type EffectiveUserBranding = {
   communityId?: string;
   displayName: string;
   logo: string;
+  assets: TenantAssets;
   palette: BrandPalette;
 };
 
@@ -148,11 +250,15 @@ export function getEffectiveUserBranding(communityId?: string): EffectiveUserBra
       mode,
       displayName: tenant.userAppName,
       logo: tenant.assets.logo,
+      assets: tenant.assets,
       palette: tenant.palette,
     };
   }
 
-  const overrides = parseCommunityOverrides(process.env.NEXT_PUBLIC_COMMUNITY_BRANDING_JSON);
+  const overrides = mergeCommunityOverrides(
+    DEFAULT_COMMUNITY_OVERRIDES,
+    parseCommunityOverrides(process.env.NEXT_PUBLIC_COMMUNITY_BRANDING_JSON)
+  );
   const communityOverride = overrides[configuredCommunityId];
   if (!communityOverride) {
     return {
@@ -161,6 +267,7 @@ export function getEffectiveUserBranding(communityId?: string): EffectiveUserBra
       communityId: configuredCommunityId,
       displayName: tenant.userAppName,
       logo: tenant.assets.logo,
+      assets: tenant.assets,
       palette: tenant.palette,
     };
   }
@@ -171,6 +278,11 @@ export function getEffectiveUserBranding(communityId?: string): EffectiveUserBra
     communityId: configuredCommunityId,
     displayName: communityOverride.name ?? tenant.userAppName,
     logo: communityOverride.logo ?? tenant.assets.logo,
+    assets: {
+      ...tenant.assets,
+      ...(communityOverride.assets ?? {}),
+      logo: communityOverride.logo ?? communityOverride.assets?.logo ?? tenant.assets.logo,
+    },
     palette: {
       ...tenant.palette,
       ...(communityOverride.palette ?? {}),

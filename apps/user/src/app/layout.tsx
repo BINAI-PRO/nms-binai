@@ -3,7 +3,11 @@ import { Manrope, JetBrains_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { IntlProvider } from "@/providers/intl-provider";
 import { env } from "@/lib/env";
-import { getActiveTenantBranding, paletteToCssVariables } from "@/lib/tenant-branding";
+import {
+  getActiveTenantBranding,
+  getEffectiveUserBranding,
+  paletteToCssVariables,
+} from "@/lib/tenant-branding";
 import "./globals.css";
 
 const bisalomSans = Manrope({
@@ -19,6 +23,7 @@ const bisalomMono = JetBrains_Mono({
 });
 
 const tenantBranding = getActiveTenantBranding();
+const userBranding = getEffectiveUserBranding();
 const metadataBase = (() => {
   try {
     return new URL(env.NEXT_PUBLIC_APP_BASE_URL);
@@ -28,18 +33,18 @@ const metadataBase = (() => {
 })();
 
 export const metadata: Metadata = {
-  title: tenantBranding.platformName,
+  title: `${userBranding.displayName} | App Residentes`,
   description: tenantBranding.platformDescription,
   metadataBase,
   icons: {
     icon: [
-      { url: tenantBranding.assets.faviconIco },
-      { url: tenantBranding.assets.favicon16, type: "image/png", sizes: "16x16" },
-      { url: tenantBranding.assets.favicon32, type: "image/png", sizes: "32x32" },
+      { url: userBranding.assets.faviconIco },
+      { url: userBranding.assets.favicon16, type: "image/png", sizes: "16x16" },
+      { url: userBranding.assets.favicon32, type: "image/png", sizes: "32x32" },
     ],
-    apple: [{ url: tenantBranding.assets.appleTouchIcon, type: "image/png", sizes: "180x180" }],
+    apple: [{ url: userBranding.assets.appleTouchIcon, type: "image/png", sizes: "180x180" }],
   },
-  manifest: tenantBranding.assets.manifest,
+  manifest: userBranding.assets.manifest,
 };
 
 export default function RootLayout({

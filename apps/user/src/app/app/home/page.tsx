@@ -1,155 +1,173 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  AlertTriangle,
   ArrowUpRight,
-  BadgeCheck,
-  Camera,
-  MessageCircle,
-  MoreHorizontal,
-  TicketCheck,
+  CalendarClock,
+  Dumbbell,
+  House,
+  ShieldCheck,
+  Trophy,
+  Wallet,
+  Waves,
 } from "lucide-react";
 import {
   mockAnnouncements,
   mockFacilities,
   mockIncidents,
+  mockMyBookings,
   mockTransactions,
 } from "@/data/mock";
+import { getActiveTenantBranding } from "@/lib/tenant-branding";
+
+function AmenityIcon({ facilityId, size = 20 }: { facilityId: string; size?: number }) {
+  if (facilityId.includes("pool")) return <Waves size={size} />;
+  if (facilityId.includes("padel")) return <Trophy size={size} />;
+  return <Dumbbell size={size} />;
+}
 
 export default function HomePage() {
+  const tenantBranding = getActiveTenantBranding();
+  const balance = mockTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+  const reservationCredit = Math.max(balance, 0);
+  const pendingReservations = mockMyBookings.filter((booking) => booking.status === "Pendiente").length;
+  const nextMaintenanceDate = "15 Mar 2026";
+
   return (
     <div className="space-y-6">
-      <section className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Image
-              alt="Perfil"
-              src="https://picsum.photos/seed/carlos/100"
-              width={56}
-              height={56}
-              className="h-14 w-14 rounded-full border-2 border-white shadow-sm"
-            />
-            <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[var(--success)]" />
-          </div>
-          <div>
-            <p className="text-sm text-[var(--muted)]">Bienvenido,</p>
-            <h1 className="text-lg font-bold leading-tight text-[var(--foreground)]">
-              Carlos Ufano
-            </h1>
-          </div>
-        </div>
-        <Link
-          href="/user/notifications"
-          className="relative rounded-full p-2 text-[var(--primary)] hover:bg-[var(--primary)]/5"
-        >
-          <BadgeCheck size={22} />
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[var(--danger)]" />
-        </Link>
-      </section>
-
-      <section className="card relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-[#2a7a87] text-white">
-        <div className="absolute -right-8 -top-10 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
-        <div className="relative z-10 flex flex-col gap-4 p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-white/80">Saldo actual</p>
-              <h2 className="text-3xl font-bold mt-1">$12,430.50 MXN</h2>
-            </div>
-            <TicketCheck className="text-white/60" />
-          </div>
-          <div className="mt-2 flex items-center gap-2 border-t border-white/10 pt-4 text-sm text-white/90">
-            <span className="rounded-full bg-white/15 px-2 py-1 text-xs font-semibold">
-              Unidad 1C
-            </span>
-            <span>Residencial Bosques</span>
+      <section className="card overflow-hidden p-0">
+        <div className="relative h-48 w-full">
+          <Image
+            src="/encino/portada.webp"
+            alt="Portada Residencial Encino"
+            fill
+            priority
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-black/10" />
+          <div className="absolute bottom-0 w-full p-4 text-white">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em]">Comunidad principal</p>
+            <h1 className="text-2xl font-bold">Residencial Encino</h1>
+            <p className="text-sm text-white/90">Torre de 30 departamentos + 50 casas en privadas</p>
           </div>
         </div>
       </section>
 
-      <QuickActions />
+      <section className="card flex items-center justify-center gap-3 px-4 py-3 text-xs text-[var(--muted)]">
+        <Image
+          src={tenantBranding.assets.logo}
+          alt={`Logo ${tenantBranding.companyName}`}
+          width={176}
+          height={48}
+          className="h-10 w-auto opacity-90"
+        />
+        <span className="font-semibold">BISALOM Administrador Residencial</span>
+      </section>
+
+      <section className="card p-5">
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+            Micro resumen de propiedad
+          </p>
+          <h2 className="text-xl font-bold text-[var(--foreground)]">DEP-001 - Departamento</h2>
+          <p className="inline-flex items-center gap-2 text-sm text-[var(--muted)]">
+            <House size={15} className="text-[var(--primary)]" />
+            Torre Encino, Nivel 1, Residencial Encino
+          </p>
+          <p className="inline-flex items-center gap-2 text-sm text-emerald-700">
+            <ShieldCheck size={15} />
+            Mantenimiento al corriente
+          </p>
+          <p className="inline-flex items-center gap-2 text-sm text-[var(--muted)]">
+            <CalendarClock size={15} className="text-[var(--primary)]" />
+            Proximo mantenimiento: {nextMaintenanceDate}
+          </p>
+          <p className="inline-flex items-center gap-2 text-sm text-[var(--muted)]">
+            <Wallet size={15} className="text-[var(--primary)]" />
+            Credito para reservas:{" "}
+            {reservationCredit > 0
+              ? reservationCredit.toLocaleString("es-MX", { style: "currency", currency: "MXN" })
+              : "Sin saldo a favor"}
+          </p>
+          <p className="text-sm text-[var(--muted)]">
+            Reservas pendientes: <span className="font-semibold text-[var(--foreground)]">{pendingReservations}</span>
+          </p>
+          <div className="pt-1">
+            <Link
+              href="/user/wallet"
+              className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-sm font-semibold text-[var(--primary)]"
+            >
+              Ver billetera <ArrowUpRight size={15} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <Header title="Reservar amenidades" href="/user/bookings/facilities" />
+        <div className="grid gap-3">
+          {mockFacilities.map((facility) => {
+            return (
+              <article key={facility.id} className="card p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div className="rounded-2xl bg-[var(--primary)]/10 p-2.5 text-[var(--primary)]">
+                      <AmenityIcon facilityId={facility.id} />
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-[var(--foreground)]">{facility.name}</p>
+                      <p className="text-sm text-[var(--muted)]">{facility.description}</p>
+                      <p className="mt-1 text-xs text-[var(--muted)]">
+                        Intervalos de {facility.slotIntervalMinutes} min - Maximo {Math.floor(facility.maxDurationMinutes / 60)} h
+                      </p>
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
+                    {facility.status}
+                  </span>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <Header title="Proximas reservas" href="/user/bookings" />
+        <div className="grid gap-3">
+          {mockMyBookings.map((booking) => (
+            <article key={booking.id} className="card p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--foreground)]">{booking.facilityName}</p>
+                  <p className="text-xs text-[var(--muted)]">{booking.date}</p>
+                </div>
+                <span className="rounded-full bg-[var(--primary)]/10 px-2 py-1 text-xs font-semibold text-[var(--primary)]">
+                  {booking.status}
+                </span>
+              </div>
+              <p className="mt-2 text-sm text-[var(--muted)]">
+                {booking.slot} - {booking.detail}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <section className="space-y-3">
         <Header title="Incidencias recientes" href="/user/incidents" />
         <div className="grid gap-3">
           {mockIncidents.map((incident) => (
             <article key={incident.id} className="card p-4">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h3 className="text-base font-semibold text-[var(--foreground)]">
-                    {incident.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">
-                    {incident.description}
-                  </p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{incident.category}</p>
+                  <h3 className="text-base font-semibold text-[var(--foreground)]">{incident.title}</h3>
+                  <p className="text-sm text-[var(--muted)]">{incident.description}</p>
                 </div>
-                <MoreHorizontal size={18} className="text-[var(--muted)]" />
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold">
-                <span className="chip bg-[var(--primary)]/10 text-[var(--primary)]">
-                  {incident.status}
-                </span>
-                <span className="chip bg-amber-50 text-amber-700">
-                  Prioridad {incident.priority}
-                </span>
-                <span className="text-[var(--muted)]">{incident.createdAt}</span>
+                <AlertTriangle size={17} className="mt-1 text-[var(--warning)]" />
               </div>
             </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <Header title="Próximas reservas" href="/user/bookings" />
-        <div className="grid gap-3 sm:grid-cols-2">
-          {mockFacilities.map((facility) => (
-            <article key={facility.id} className="card p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
-                    {facility.type}
-                  </p>
-                  <h3 className="text-base font-semibold text-[var(--foreground)]">
-                    {facility.name}
-                  </h3>
-                  <p className="text-sm text-[var(--muted)]">{facility.location}</p>
-                </div>
-                <span className="rounded-full bg-[var(--primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--primary)]">
-                  {facility.status}
-                </span>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <Header title="Movimientos de billetera" href="/user/wallet" />
-        <div className="grid gap-3">
-          {mockTransactions.map((tx) => (
-            <div
-              key={tx.id}
-              className="card flex items-center justify-between px-4 py-3"
-            >
-              <div>
-                <p className="text-sm font-semibold text-[var(--foreground)]">
-                  {tx.title}
-                </p>
-                <p className="text-xs text-[var(--muted)]">{tx.date}</p>
-              </div>
-              <div className="text-right">
-                <p
-                  className={`text-sm font-bold ${
-                    tx.amount >= 0 ? "text-[var(--success)]" : "text-[var(--foreground)]"
-                  }`}
-                >
-                  {tx.amount >= 0 ? "+" : ""}
-                  {tx.amount.toLocaleString("es-MX", {
-                    style: "currency",
-                    currency: "MXN",
-                  })}
-                </p>
-                <p className="text-xs text-[var(--muted)]">{tx.status}</p>
-              </div>
-            </div>
           ))}
         </div>
       </section>
@@ -157,52 +175,23 @@ export default function HomePage() {
       <section className="space-y-3">
         <Header title="Comunidad" href="/user/community" />
         <div className="grid gap-3">
-          {mockAnnouncements.map((a) => (
-            <article key={a.id} className="card overflow-hidden">
-              <div className="relative h-40 w-full">
-                <Image
-                  src={a.image}
-                  alt={a.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width:768px) 100vw, 600px"
-                />
-                <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[var(--primary)]">
-                  {a.tag}
+          {mockAnnouncements.map((announcement) => (
+            <article key={announcement.id} className="card overflow-hidden">
+              <div className="relative h-36 w-full">
+                <Image src={announcement.image} alt={announcement.title} fill className="object-cover" sizes="(max-width:768px) 100vw, 600px" />
+                <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-[var(--primary)]">
+                  {announcement.tag}
                 </span>
               </div>
               <div className="space-y-1 p-4">
-                <h3 className="text-base font-semibold text-[var(--foreground)]">{a.title}</h3>
-                <p className="text-sm text-[var(--muted)]">{a.excerpt}</p>
+                <h3 className="text-base font-semibold text-[var(--foreground)]">{announcement.title}</h3>
+                <p className="text-sm text-[var(--muted)]">{announcement.excerpt}</p>
               </div>
             </article>
           ))}
         </div>
       </section>
     </div>
-  );
-}
-
-function QuickActions() {
-  return (
-    <section className="grid grid-cols-3 gap-3">
-      {[
-        { label: "Reportar", icon: Camera, href: "/user/incidents/new" },
-        { label: "Reservar", icon: TicketCheck, href: "/user/bookings/facilities" },
-        { label: "Comentar", icon: MessageCircle, href: "/user/community" },
-      ].map((action) => (
-        <Link
-          href={action.href}
-          key={action.label}
-          className="card flex flex-col items-center gap-2 px-3 py-4 text-center text-sm font-semibold text-[var(--foreground)] hover:border-[var(--primary)]"
-        >
-          <div className="rounded-full bg-[var(--primary)]/10 p-3 text-[var(--primary)]">
-            <action.icon size={20} />
-          </div>
-          {action.label}
-        </Link>
-      ))}
-    </section>
   );
 }
 

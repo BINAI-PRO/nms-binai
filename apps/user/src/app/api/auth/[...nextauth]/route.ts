@@ -29,6 +29,8 @@ const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const email = credentials?.email?.trim();
         const password = credentials?.password;
+        const communityId =
+          credentials?.communityId?.trim() || process.env.NEXT_PUBLIC_DEFAULT_COMMUNITY_ID?.trim() || null;
         if (!email || !password) return null;
         if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return null;
 
@@ -49,7 +51,7 @@ const authOptions: NextAuthOptions = {
           uid: user.id,
           email: user.email ?? email,
           name: userName,
-          communityId: credentials?.communityId ?? null,
+          communityId,
         });
 
         return sessionUser;
@@ -65,6 +67,8 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.idToken) return null;
+        const communityId =
+          credentials?.communityId?.trim() || process.env.NEXT_PUBLIC_DEFAULT_COMMUNITY_ID?.trim() || null;
         const firebaseAuth = getFirebaseAuth();
         const decoded = await firebaseAuth.verifyIdToken(credentials.idToken);
 
@@ -73,7 +77,7 @@ const authOptions: NextAuthOptions = {
           uid: decoded.uid,
           email,
           name: decoded.name,
-          communityId: credentials.communityId ?? null,
+          communityId,
         });
         return sessionUser;
       },

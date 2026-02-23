@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { type AccessPassRow, decorateAccessPass } from "@/lib/access-passes";
 import { supabaseAdmin } from "@/lib/supabase";
 
 const createPassSchema = z.object({
@@ -25,10 +26,6 @@ function generateToken(type: "visitor" | "service") {
   return `${prefix}-${suffix}`;
 }
 
-function qrImageUrl(payload: string) {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(payload)}`;
-}
-
 export async function GET(request: Request) {
   if (!supabaseAdmin) {
     return NextResponse.json({ error: "Supabase no configurado" }, { status: 500 });
@@ -36,9 +33,9 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const parsed = querySchema.safeParse({
-    community_id: searchParams.get("community_id"),
-    status: searchParams.get("status"),
-    limit: searchParams.get("limit"),
+    community_id: searchParams.get("community_id") ?? undefined,
+    status: searchParams.get("status") ?? undefined,
+    limit: searchParams.get("limit") ?? undefined,
   });
 
   if (!parsed.success) {
@@ -48,7 +45,7 @@ export async function GET(request: Request) {
   let query = supabaseAdmin
     .from("access_passes")
     .select(
-      "id,community_id,type,label,token,status,valid_from,valid_until,max_uses,used_count,last_used_at,created_at"
+      "id,community_id,type,label,token,qr_payload,status,valid_from,valid_until,max_uses,used_count,last_used_at,created_at"
     )
     .order("created_at", { ascending: false })
     .limit(parsed.data.limit);
@@ -65,17 +62,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: result.error.message }, { status: 500 });
   }
 
-  const now = Date.now();
-  const passes = (result.data ?? []).map((item) => {
-    const effectiveStatus =
-      item.status === "active" && new Date(item.valid_until).getTime() < now ? "expired" : item.status;
-
-    return {
-      ...item,
-      effective_status: effectiveStatus,
-      qr_image_url: qrImageUrl(item.token),
-    };
-  });
+  const nowTimestamp = Date.now();
+  const passes = await Promise.all(
+    ((result.data ?? []) as AccessPassRow[]).map((item) => decorateAccessPass(item, nowTimestamp))
+  );
 
   return NextResponse.json({ passes });
 }
@@ -116,7 +106,7 @@ export async function POST(request: Request) {
       metadata: parsed.data.metadata ?? {},
     })
     .select(
-      "id,community_id,type,label,token,status,valid_from,valid_until,max_uses,used_count,last_used_at,created_at"
+      "id,community_id,type,label,token,qr_payload,status,valid_from,valid_until,max_uses,used_count,last_used_at,created_at"
     )
     .single();
 
@@ -124,12 +114,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: insert.error.message }, { status: 500 });
   }
 
-  const pass = insert.data;
-  return NextResponse.json({
-    pass: {
-      ...pass,
-      effective_status: pass.status,
-      qr_image_url: qrImageUrl(pass.token),
-    },
-  });
+  const pass = await decorateAccessPass(insert.data as AccessPassRow);
+  return NextResponse.json({ pass });
 }

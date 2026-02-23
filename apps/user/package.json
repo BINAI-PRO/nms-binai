@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack -H 127.0.0.1 -p 3000",
+    "dev:mobile": "next dev --webpack -H 0.0.0.0 -p 3000",
     "build": "next build --webpack",
     "start": "next start -H 127.0.0.1 -p 3000",
     "vercel-build": "next build --webpack",
@@ -29,6 +30,7 @@
     "next": "16.1.6",
     "next-auth": "^4.24.13",
     "next-intl": "^4.8.1",
+    "qrcode": "^1.5.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.1",
@@ -39,6 +41,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

@@ -15,13 +15,9 @@ type SessionPayload = {
 export default function SignInPage() {
   const router = useRouter();
   const tenantBranding = getActiveTenantBranding();
+  const fixedCommunityId = (process.env.NEXT_PUBLIC_DEFAULT_COMMUNITY_ID ?? "").trim();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [communityId, setCommunityId] = useState(() => {
-    const fallbackCommunityId = process.env.NEXT_PUBLIC_DEFAULT_COMMUNITY_ID ?? "";
-    if (typeof window === "undefined") return fallbackCommunityId;
-    return window.localStorage.getItem("nms_active_community_id")?.trim() || fallbackCommunityId;
-  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,22 +27,19 @@ export default function SignInPage() {
     setError(null);
 
     try {
+      if (!fixedCommunityId) {
+        throw new Error("Falta NEXT_PUBLIC_DEFAULT_COMMUNITY_ID en .env.local");
+      }
+
       const result = await signIn("supabase-password", {
         email,
         password,
-        communityId: communityId || undefined,
+        communityId: fixedCommunityId,
         redirect: false,
       });
 
       if (!result || result.error) {
         throw new Error("Correo o password incorrecto");
-      }
-
-      const selectedCommunityId = communityId.trim();
-      if (selectedCommunityId) {
-        window.localStorage.setItem("nms_active_community_id", selectedCommunityId);
-      } else {
-        window.localStorage.removeItem("nms_active_community_id");
       }
 
       const sessionResponse = await fetch("/api/auth/session", { cache: "no-store" });
@@ -114,21 +107,6 @@ export default function SignInPage() {
             />
           </div>
 
-          <div className="space-y-2">
-            <details className="rounded-lg border border-[var(--border)] bg-slate-50 px-3 py-2">
-              <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">
-                Opcional: seleccionar comunidad
-              </summary>
-              <input
-                type="text"
-                value={communityId}
-                onChange={(event) => setCommunityId(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm focus:border-[var(--primary)] focus:outline-none"
-                placeholder="UUID de comunidad"
-              />
-            </details>
-          </div>
-
           {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
 
           <button
@@ -138,6 +116,17 @@ export default function SignInPage() {
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
+
+        <footer className="flex items-center justify-center gap-3 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
+          <Image
+            src={tenantBranding.assets.logo}
+            alt={`Logo ${tenantBranding.companyName}`}
+            width={176}
+            height={48}
+            className="h-10 w-auto opacity-90"
+          />
+          <span>BISALOM Administrador Residencial</span>
+        </footer>
       </section>
     </main>
   );

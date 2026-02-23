@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ShieldCheck, ShieldX } from "lucide-react";
+import { Eye, ShieldCheck, ShieldX, X } from "lucide-react";
 
 type AccessPassType = "visitor" | "service";
 type AccessPassStatus = "active" | "revoked" | "expired" | "used_up";
@@ -13,12 +15,14 @@ export type AdminAccessPass = {
   label: string;
   token: string;
   status: AccessPassStatus;
+  effective_status: AccessPassStatus;
   valid_from: string;
   valid_until: string;
   max_uses: number;
   used_count: number;
   last_used_at: string | null;
   created_at: string;
+  qr_image_url: string;
 };
 
 function statusStyle(status: AccessPassStatus) {
@@ -31,8 +35,30 @@ function statusStyle(status: AccessPassStatus) {
 function statusLabel(status: AccessPassStatus) {
   if (status === "active") return "Activo";
   if (status === "revoked") return "Revocado";
-  if (status === "used_up") return "Usado";
+  if (status === "used_up") return "Sin usos";
   return "Expirado";
+}
+
+function passTypeLabel(type: AccessPassType) {
+  return type === "visitor" ? "Invitado" : "Servicio";
+}
+
+function parseApiError(errorPayload: unknown, fallback: string) {
+  if (typeof errorPayload === "string" && errorPayload.trim()) return errorPayload;
+
+  if (errorPayload && typeof errorPayload === "object") {
+    const asRecord = errorPayload as Record<string, unknown>;
+    const maybeMessage = asRecord.message;
+    if (typeof maybeMessage === "string" && maybeMessage.trim()) return maybeMessage;
+
+    const formErrors = asRecord.formErrors;
+    if (Array.isArray(formErrors)) {
+      const first = formErrors.find((item) => typeof item === "string" && item.trim());
+      if (typeof first === "string") return first;
+    }
+  }
+
+  return fallback;
 }
 
 export function AdminAccessClient({ initialPasses }: { initialPasses: AdminAccessPass[] }) {
@@ -41,6 +67,7 @@ export function AdminAccessClient({ initialPasses }: { initialPasses: AdminAcces
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPass, setSelectedPass] = useState<AdminAccessPass | null>(null);
 
   const now = Date.now();
   const mapped = useMemo(() => {
@@ -80,10 +107,12 @@ export function AdminAccessClient({ initialPasses }: { initialPasses: AdminAcces
         body: JSON.stringify({ status }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data?.error ?? "No se pudo actualizar el pase");
-      setPasses((prev) => prev.map((item) => (item.id === id ? { ...item, status: data.pass.status } : item)));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo actualizar el pase");
+      if (!response.ok) throw new Error(parseApiError(data?.error, "No se pudo actualizar el pase"));
+      setPasses((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, status: data.pass.status } : item))
+      );
+    } catch (statusError) {
+      setError(statusError instanceof Error ? statusError.message : "No se pudo actualizar el pase");
     } finally {
       setUpdatingId(null);
     }
@@ -92,10 +121,20 @@ export function AdminAccessClient({ initialPasses }: { initialPasses: AdminAcces
   return (
     <section className="space-y-4">
       <header className="card space-y-3 p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
-          Admin · access
-        </p>
-        <h2 className="text-lg font-bold text-[var(--foreground)]">Control de accesos QR/token</h2>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+              Admin - accesos
+            </p>
+            <h2 className="text-lg font-bold text-[var(--foreground)]">Control de pases QR y token</h2>
+          </div>
+          <Link
+            href="/admin/guardian"
+            className="rounded-full bg-[var(--primary)]/10 px-3 py-1.5 text-xs font-semibold text-[var(--primary)]"
+          >
+            Modo guardia
+          </Link>
+        </div>
         <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
           <Stat label="Total" value={stats.total} />
           <Stat label="Activos" value={stats.active} />
@@ -131,49 +170,101 @@ export function AdminAccessClient({ initialPasses }: { initialPasses: AdminAcces
           <article className="card p-4 text-sm text-[var(--muted)]">Sin registros para ese filtro.</article>
         ) : (
           filtered.map((item) => (
-            <article key={item.id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-bold text-[var(--foreground)]">{item.label}</p>
-                <p className="text-xs text-[var(--muted)]">
-                  {item.type === "visitor" ? "Invitado" : "Servicio"} · comunidad {item.community_id}
-                </p>
-                <p className="font-mono text-[11px] text-[var(--muted)]">{item.token}</p>
-                <p className="text-xs text-[var(--muted)]">
-                  {new Date(item.valid_from).toLocaleString("es-MX")} - {new Date(item.valid_until).toLocaleString("es-MX")}
-                </p>
-              </div>
+            <article key={item.id} className="card flex flex-col gap-3 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <Image
+                    src={item.qr_image_url}
+                    alt={`QR ${item.label}`}
+                    width={60}
+                    height={60}
+                    unoptimized
+                    className="rounded-lg border border-slate-200 bg-white p-1"
+                  />
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-[var(--foreground)]">{item.label}</p>
+                    <p className="text-xs text-[var(--muted)]">
+                      {passTypeLabel(item.type)} - comunidad {item.community_id}
+                    </p>
+                    <p className="font-mono text-[11px] text-[var(--muted)]">{item.token}</p>
+                    <p className="text-xs text-[var(--muted)]">
+                      {new Date(item.valid_from).toLocaleString("es-MX")} -{" "}
+                      {new Date(item.valid_until).toLocaleString("es-MX")}
+                    </p>
+                    <p className="text-xs text-[var(--muted)]">
+                      usos {item.used_count}/{item.max_uses}
+                    </p>
+                  </div>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${statusStyle(item.effectiveStatus)}`}>
-                  {statusLabel(item.effectiveStatus)}
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${statusStyle(item.effectiveStatus)}`}>
+                    {statusLabel(item.effectiveStatus)}
+                  </span>
 
-                {item.status === "active" ? (
                   <button
                     type="button"
-                    disabled={updatingId === item.id}
-                    onClick={() => void updateStatus(item.id, "revoked")}
-                    className="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+                    onClick={() => setSelectedPass(item)}
+                    className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)]"
                   >
-                    <ShieldX size={14} />
-                    Revocar
+                    <Eye size={13} /> Ver QR
                   </button>
-                ) : (
-                  <button
-                    type="button"
-                    disabled={updatingId === item.id}
-                    onClick={() => void updateStatus(item.id, "active")}
-                    className="inline-flex items-center gap-1 rounded-full bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
-                  >
-                    <ShieldCheck size={14} />
-                    Reactivar
-                  </button>
-                )}
+
+                  {item.status === "active" ? (
+                    <button
+                      type="button"
+                      disabled={updatingId === item.id}
+                      onClick={() => void updateStatus(item.id, "revoked")}
+                      className="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+                    >
+                      <ShieldX size={14} /> Revocar
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={updatingId === item.id}
+                      onClick={() => void updateStatus(item.id, "active")}
+                      className="inline-flex items-center gap-1 rounded-full bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+                    >
+                      <ShieldCheck size={14} /> Reactivar
+                    </button>
+                  )}
+                </div>
               </div>
             </article>
           ))
         )}
       </div>
+
+      {selectedPass ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4">
+          <div className="card w-full max-w-sm space-y-3 p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-semibold text-[var(--foreground)]">{selectedPass.label}</p>
+                <p className="text-xs text-[var(--muted)]">{passTypeLabel(selectedPass.type)}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedPass(null)}
+                className="rounded-full bg-slate-100 p-1.5 text-slate-600"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <Image
+                src={selectedPass.qr_image_url}
+                alt="QR seleccionado"
+                width={260}
+                height={260}
+                unoptimized
+                className="rounded-xl border border-slate-200 bg-white p-2"
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
