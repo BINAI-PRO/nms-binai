@@ -32,11 +32,7 @@ type SessionSummary = {
 
 const navItems: NavItem[] = [
   { href: "/user/home", label: "Inicio", icon: Home },
-  {
-    href: "/user/incidents",
-    label: "Incidencias",
-    icon: ShieldAlert,
-  },
+  { href: "/user/passes", label: "Accesos", icon: QrCode },
   {
     href: "/user/bookings",
     label: "Reservas",
@@ -44,7 +40,11 @@ const navItems: NavItem[] = [
   },
   { href: "/user/community", label: "Comunidad", icon: Users },
   { href: "/user/wallet", label: "Billetera", icon: Wallet },
-  { href: "/user/passes", label: "Accesos", icon: QrCode },
+  {
+    href: "/user/incidents",
+    label: "Incidencias",
+    icon: ShieldAlert,
+  },
 ];
 
 function getUserInitials(name?: string | null, email?: string | null) {
@@ -110,8 +110,8 @@ function DesktopNav() {
             href={item.href}
             className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
               active
-                ? "border-transparent bg-[var(--primary)] text-white"
-                : "border-[var(--border)] bg-white text-[var(--foreground)] hover:border-[var(--primary)]"
+                ? "border-transparent bg-white text-slate-900"
+                : "border-white/30 bg-white/10 text-white hover:border-white/60 hover:bg-white/15"
             }`}
           >
             {item.label}
@@ -208,18 +208,18 @@ export function AppShell({ children }: { children: ReactNode }) {
       style={paletteToCssVariables(userBranding.palette)}
     >
       <div className="mx-auto w-full max-w-md lg:max-w-[1120px] lg:px-6">
-        <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-white/95 backdrop-blur lg:top-4 lg:rounded-2xl lg:border lg:shadow-sm">
+        <header className="sticky top-0 z-30 border-b border-slate-700/70 bg-slate-900/95 backdrop-blur lg:top-4 lg:rounded-2xl lg:border lg:shadow-sm">
           <div className="mx-auto flex w-full items-center justify-between px-4 py-3 lg:px-5">
             <div className="flex items-center gap-3">
               <Image
                 src={userBranding.logo}
                 alt={`Logo ${userBranding.displayName}`}
-                width={132}
-                height={38}
+                width={144}
+                height={40}
                 priority
-                className="h-8 w-auto"
+                className="h-9 w-auto"
               />
-              <p className="hidden text-sm font-semibold text-[var(--foreground)] sm:block">App Residentes</p>
+              <p className="hidden text-sm font-semibold text-white/90 sm:block">App Residentes</p>
             </div>
             <div ref={menuRef} className="relative">
               <button
@@ -227,7 +227,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 onClick={() =>
                   setMenuOpenPath((current) => (current === pathname || !pathname ? null : pathname))
                 }
-                className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-2 py-1 text-xs font-semibold text-[var(--foreground)] shadow-sm transition hover:border-[var(--primary)]"
+                className="flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-2 py-1 text-xs font-semibold text-white shadow-sm transition hover:border-white/50 hover:bg-white/15"
                 aria-expanded={menuOpen}
                 aria-haspopup="menu"
                 aria-label="Abrir menu de cuenta"

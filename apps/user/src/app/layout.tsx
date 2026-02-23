@@ -3,6 +3,7 @@ import { Manrope, JetBrains_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { IntlProvider } from "@/providers/intl-provider";
 import { env } from "@/lib/env";
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import {
   getActiveTenantBranding,
   getEffectiveUserBranding,
@@ -58,7 +59,10 @@ export default function RootLayout({
         className={`${bisalomSans.variable} ${bisalomMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
         style={paletteToCssVariables(tenantBranding.palette)}
       >
-        <IntlProvider>{children}</IntlProvider>
+        <IntlProvider>
+          {children}
+          <PwaInstallPrompt />
+        </IntlProvider>
       </body>
     </html>
   );
