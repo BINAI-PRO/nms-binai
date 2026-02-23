@@ -7,6 +7,7 @@ import { upsertUserAndMemberships, type SessionUser } from "@/lib/auth/supabase-
 
 type JwtPayload = {
   id?: string;
+  image?: string | null;
   role?: string;
   community_ids?: string[];
   active_community_id?: string | null;
@@ -46,11 +47,17 @@ const authOptions: NextAuthOptions = {
           (user.user_metadata?.full_name as string | undefined) ??
           (user.user_metadata?.name as string | undefined) ??
           null;
+        const userImage =
+          (user.user_metadata?.avatar_url as string | undefined) ??
+          (user.user_metadata?.picture as string | undefined) ??
+          (user.user_metadata?.avatar as string | undefined) ??
+          null;
 
         const sessionUser = await upsertUserAndMemberships({
           uid: user.id,
           email: user.email ?? email,
           name: userName,
+          avatarUrl: userImage,
           communityId,
         });
 
@@ -77,6 +84,7 @@ const authOptions: NextAuthOptions = {
           uid: decoded.uid,
           email,
           name: decoded.name,
+          avatarUrl: typeof decoded.picture === "string" ? decoded.picture : null,
           communityId,
         });
         return sessionUser;
@@ -91,6 +99,7 @@ const authOptions: NextAuthOptions = {
       if (user) {
         const sessionUser = user as SessionUser;
         token.id = sessionUser.id;
+        token.image = sessionUser.image ?? null;
         token.role = sessionUser.role;
         token.community_ids = sessionUser.community_ids;
         token.active_community_id = sessionUser.active_community_id;
@@ -105,6 +114,7 @@ const authOptions: NextAuthOptions = {
         id: string;
         email: string;
         name: string;
+        image: string | null;
         role: string;
         community_ids: string[];
         active_community_id: string | null;
@@ -115,6 +125,7 @@ const authOptions: NextAuthOptions = {
         id: jwt.id ?? "",
         email: session.user?.email ?? "",
         name: session.user?.name ?? "",
+        image: typeof jwt.image === "string" ? jwt.image : null,
         role: jwt.role ?? "resident",
         community_ids: jwt.community_ids ?? [],
         active_community_id: jwt.active_community_id ?? null,

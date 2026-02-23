@@ -6,19 +6,28 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   CalendarClock,
+  ChevronDown,
   Home,
+  LogOut,
   QrCode,
   ShieldAlert,
+  UserCircle2,
   Users,
   Wallet,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { getActiveTenantBranding, getEffectiveUserBranding, paletteToCssVariables } from "@/lib/tenant-branding";
 
 type NavItem = {
   href: string;
   label: string;
   icon: typeof Home;
+};
+
+type SessionSummary = {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
 };
 
 const navItems: NavItem[] = [
@@ -37,6 +46,16 @@ const navItems: NavItem[] = [
   { href: "/user/wallet", label: "Billetera", icon: Wallet },
   { href: "/user/passes", label: "Accesos", icon: QrCode },
 ];
+
+function getUserInitials(name?: string | null, email?: string | null) {
+  const source = (name && name.trim().length > 0 ? name : email)?.trim() ?? "";
+  if (!source) return "US";
+  const parts = source.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
+}
 
 function isItemActive(pathname: string | null, item: NavItem) {
   if (!pathname) return false;
@@ -127,12 +146,57 @@ function PoweredFooter() {
 export function AppShell({ children }: { children: ReactNode }) {
   const userBranding = getEffectiveUserBranding();
   const pathname = usePathname();
+  const [menuOpenPath, setMenuOpenPath] = useState<string | null>(null);
+  const [sessionSummary, setSessionSummary] = useState<SessionSummary>({});
+  const [failedAvatarSrc, setFailedAvatarSrc] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const normalizedPath = pathname?.startsWith("/app/")
     ? pathname.replace("/app/", "/user/")
     : pathname === "/app"
       ? "/user"
       : pathname;
   const showPoweredFooter = !normalizedPath?.startsWith("/user/home");
+  const menuOpen = Boolean(pathname && menuOpenPath === pathname);
+  const avatarInitials = useMemo(
+    () => getUserInitials(sessionSummary.name, sessionSummary.email),
+    [sessionSummary.email, sessionSummary.name]
+  );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadSession() {
+      try {
+        const response = await fetch("/api/auth/session", {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const payload = (await response.json()) as { user?: SessionSummary | null };
+        setSessionSummary(payload.user ?? {});
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          setSessionSummary({});
+        }
+      }
+    }
+    void loadSession();
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpenPath(null);
+      }
+    }
+    if (!menuOpen) return;
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [menuOpen]);
 
   async function onLogout() {
     await signOut({ callbackUrl: "/sign-in" });
@@ -157,13 +221,63 @@ export function AppShell({ children }: { children: ReactNode }) {
               />
               <p className="hidden text-sm font-semibold text-[var(--foreground)] sm:block">App Residentes</p>
             </div>
-            <button
-              type="button"
-              onClick={() => void onLogout()}
-              className="rounded-full bg-[var(--primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--primary)]"
-            >
-              Salir
-            </button>
+            <div ref={menuRef} className="relative">
+              <button
+                type="button"
+                onClick={() =>
+                  setMenuOpenPath((current) => (current === pathname || !pathname ? null : pathname))
+                }
+                className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-2 py-1 text-xs font-semibold text-[var(--foreground)] shadow-sm transition hover:border-[var(--primary)]"
+                aria-expanded={menuOpen}
+                aria-haspopup="menu"
+                aria-label="Abrir menu de cuenta"
+              >
+                <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[var(--primary)]/15 text-[11px] font-bold uppercase text-[var(--primary)]">
+                  {sessionSummary.image && sessionSummary.image !== failedAvatarSrc ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={sessionSummary.image}
+                      alt={sessionSummary.name ? `Foto de ${sessionSummary.name}` : "Foto de perfil"}
+                      className="h-full w-full object-cover"
+                      onError={() => setFailedAvatarSrc(sessionSummary.image ?? null)}
+                    />
+                  ) : (
+                    avatarInitials
+                  )}
+                </span>
+                <ChevronDown size={14} className={`${menuOpen ? "rotate-180" : ""} transition`} />
+              </button>
+
+              {menuOpen ? (
+                <div className="absolute right-0 top-11 z-50 w-52 overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-lg">
+                  <div className="border-b border-[var(--border)] px-3 py-2">
+                    <p className="line-clamp-1 text-xs font-semibold text-[var(--foreground)]">
+                      {sessionSummary.name ?? "Mi cuenta"}
+                    </p>
+                    <p className="line-clamp-1 text-[11px] text-[var(--muted)]">{sessionSummary.email ?? ""}</p>
+                  </div>
+                  <Link
+                    href="/user/profile"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--primary)]/10"
+                    onClick={() => setMenuOpenPath(null)}
+                  >
+                    <UserCircle2 size={16} />
+                    Perfil
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpenPath(null);
+                      void onLogout();
+                    }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[var(--foreground)] transition hover:bg-[var(--primary)]/10"
+                  >
+                    <LogOut size={16} />
+                    Cerrar sesion
+                  </button>
+                </div>
+              ) : null}
+            </div>
           </div>
           <div className="px-4 lg:px-5">
             <DesktopNav />

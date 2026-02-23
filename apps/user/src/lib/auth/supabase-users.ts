@@ -11,6 +11,7 @@ export type SessionUser = {
   id: string;
   email: string;
   name?: string | null;
+  image?: string | null;
   role: string;
   community_ids: string[];
   active_community_id: string | null;
@@ -22,13 +23,14 @@ export async function upsertUserAndMemberships(params: {
   uid: string;
   email: string;
   name?: string | null;
+  avatarUrl?: string | null;
   communityId?: string | null;
 }): Promise<SessionUser> {
   if (!supabaseAdmin) {
     throw new Error("Supabase no configurado");
   }
 
-  const { uid, email, name, communityId } = params;
+  const { uid, email, name, avatarUrl, communityId } = params;
 
   const upsertRes = await supabaseAdmin
     .from("users")
@@ -68,6 +70,7 @@ export async function upsertUserAndMemberships(params: {
     id: uid,
     email,
     name: upsertRes.data.full_name,
+    image: avatarUrl ?? null,
     role: primary?.role ?? "resident",
     community_ids: memberships.data?.map((m) => m.community_id) ?? [],
     active_community_id: primary?.community_id ?? null,
