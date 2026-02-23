@@ -76,7 +76,7 @@ export default function SignInPage() {
           />
           <div className="absolute inset-0 bg-black/25" />
           <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em]">Acceso residentes</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em]"></p>
             <p className="text-lg font-bold">{tenantBranding.userAppName}</p>
           </div>
         </div>

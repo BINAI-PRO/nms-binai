@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CalendarClock, CircleCheck, Clock3, Dumbbell, Trophy, Wallet, Waves } from "lucide-react";
-import { mockFacilities, mockMyBookings, mockTransactions } from "@/data/mock";
+import { ArrowRight, CalendarClock, CircleCheck, Clock3, Dumbbell, Trophy, Waves } from "lucide-react";
+import { mockFacilities, mockMyBookings } from "@/data/mock";
 
 function AmenityIcon({ facilityId, size = 20 }: { facilityId: string; size?: number }) {
   if (facilityId.includes("pool")) return <Waves size={size} />;
@@ -12,10 +12,6 @@ function AmenityIcon({ facilityId, size = 20 }: { facilityId: string; size?: num
 export default function Page() {
   const totalConfirmed = mockMyBookings.filter((booking) => booking.status === "Confirmada").length;
   const pendingReservations = mockMyBookings.filter((booking) => booking.status === "Pendiente").length;
-  const balance = mockTransactions.reduce((sum, tx) => sum + tx.amount, 0);
-  const reservationCredit = Math.max(balance, 0);
-  const nextMaintenanceDate = "15 Mar 2026";
-  const maintenanceAmount = 2150;
 
   return (
     <div className="space-y-5">
@@ -31,42 +27,29 @@ export default function Page() {
           <div className="absolute inset-0 bg-gradient-to-br from-slate-950/85 via-slate-900/70 to-[var(--primary)]/75" />
 
           <div className="relative space-y-3 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/80">Resumen de billetera</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/80">Reservaciones activas</p>
             <h1 className="text-2xl font-bold">
-              {balance.toLocaleString("es-MX", { style: "currency", currency: "MXN" })}
+              {totalConfirmed} confirmadas
             </h1>
-            <p className="text-sm text-white/90">Saldo disponible para pagos, cuotas y reservas.</p>
+            <p className="text-sm text-white/90">
+              Agenda por bloques de 30 minutos en alberca, padel y gimnasio.
+            </p>
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-xl border border-white/20 bg-white/10 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-wide text-white/75">Mantenimiento</p>
-                <p className="text-sm font-semibold">Al corriente</p>
-                <p className="text-[11px] text-white/75">
-                  Proximo {nextMaintenanceDate} -{" "}
-                  {maintenanceAmount.toLocaleString("es-MX", { style: "currency", currency: "MXN" })}
-                </p>
+                <p className="text-[11px] uppercase tracking-wide text-white/75">Turnos confirmados</p>
+                <p className="text-sm font-semibold">{totalConfirmed}</p>
+                <p className="text-[11px] text-white/75">Listos para uso</p>
               </div>
               <div className="rounded-xl border border-white/20 bg-white/10 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-wide text-white/75">Creditos y reservas</p>
-                <p className="text-sm font-semibold">
-                  {reservationCredit.toLocaleString("es-MX", { style: "currency", currency: "MXN" })}
-                </p>
-                <p className="text-[11px] text-white/75">Pendientes: {pendingReservations}</p>
+                <p className="text-[11px] uppercase tracking-wide text-white/75">Turnos pendientes</p>
+                <p className="text-sm font-semibold">{pendingReservations}</p>
+                <p className="text-[11px] text-white/75">En validacion</p>
               </div>
             </div>
-            <p className="text-xs text-white/85">
-              Reservaciones activas: <span className="font-semibold">{totalConfirmed} confirmadas</span>
-            </p>
             <div className="flex flex-wrap gap-2">
               <Link
-                href="/user/wallet"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-slate-900"
-              >
-                <Wallet size={15} />
-                Ver billetera
-              </Link>
-              <Link
                 href="/user/bookings/facilities"
-                className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-slate-900"
               >
                 <CalendarClock size={15} />
                 Ver instalaciones <ArrowRight size={15} />
