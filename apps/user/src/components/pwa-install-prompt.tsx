@@ -17,6 +17,7 @@ type PromptVariant = "install" | "ios" | "hidden";
 
 const INSTALL_STATE_KEY = "nms-user-pwa-install-state";
 const DISMISS_SESSION_KEY = "nms-user-pwa-install-dismissed-session";
+const SHOWN_SESSION_KEY = "nms-user-pwa-install-shown-session";
 
 function isStandaloneMode() {
   if (typeof window === "undefined") return false;
@@ -36,7 +37,8 @@ function shouldSkipPrompt() {
   if (typeof window === "undefined") return true;
   const installed = window.localStorage?.getItem(INSTALL_STATE_KEY) === "installed";
   const dismissed = window.sessionStorage?.getItem(DISMISS_SESSION_KEY) === "1";
-  return installed || dismissed || isStandaloneMode();
+  const shown = window.sessionStorage?.getItem(SHOWN_SESSION_KEY) === "1";
+  return installed || dismissed || shown || isStandaloneMode();
 }
 
 export function PwaInstallPrompt() {
@@ -67,6 +69,7 @@ export function PwaInstallPrompt() {
 
     const handleBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
+      window.sessionStorage?.setItem(SHOWN_SESSION_KEY, "1");
       setDeferredPrompt(event as BeforeInstallPromptEvent);
       setVariant("install");
     };
@@ -84,7 +87,11 @@ export function PwaInstallPrompt() {
     let iosTimer: number | undefined;
     if (isIosDevice()) {
       iosTimer = window.setTimeout(() => {
-        setVariant((current) => (current === "hidden" ? "ios" : current));
+        setVariant((current) => {
+          if (current !== "hidden") return current;
+          window.sessionStorage?.setItem(SHOWN_SESSION_KEY, "1");
+          return "ios";
+        });
       }, 0);
     }
 

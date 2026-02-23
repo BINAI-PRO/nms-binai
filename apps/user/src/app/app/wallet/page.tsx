@@ -15,7 +15,7 @@ export default function Page() {
       <div className="card overflow-hidden text-white">
         <div className="relative">
           <Image
-            src="/encino/portada_am.webp"
+            src="/encino/portada_mt.webp"
             alt="Portada financiera de Residencial Encino"
             fill
             priority
