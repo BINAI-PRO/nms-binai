@@ -16,6 +16,8 @@ export default function SignInPage() {
   const router = useRouter();
   const tenantBranding = getActiveTenantBranding();
   const userBranding = getEffectiveUserBranding();
+  const contrastUserLogo = userBranding.assets.logoContrast ?? userBranding.logo;
+  const contrastTenantLogo = tenantBranding.assets.logoContrast ?? tenantBranding.assets.logo;
   const fixedCommunityId = (process.env.NEXT_PUBLIC_DEFAULT_COMMUNITY_ID ?? "").trim();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -85,7 +87,7 @@ export default function SignInPage() {
           <header className="space-y-1 text-center">
             <div className="flex justify-center">
               <Image
-                src={userBranding.logo}
+                src={contrastUserLogo}
                 alt={`Logo ${userBranding.displayName}`}
                 width={180}
                 height={48}
@@ -134,7 +136,7 @@ export default function SignInPage() {
 
           <footer className="flex items-center justify-center gap-3 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
             <Image
-              src={tenantBranding.assets.logo}
+              src={contrastTenantLogo}
               alt={`Logo ${tenantBranding.companyName}`}
               width={176}
               height={48}
