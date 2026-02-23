@@ -46,7 +46,7 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-black/10" />
           <div className="absolute bottom-0 w-full p-4 text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em]">Comunidad principal</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em]"></p>
             <h1 className="text-2xl font-bold">Residencial Encino</h1>
             <p className="text-sm text-white/90">Torre de 30 departamentos + 50 casas en privadas</p>
           </div>

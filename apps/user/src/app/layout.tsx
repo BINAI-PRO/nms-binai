@@ -30,13 +30,32 @@ const socialPreviewImage =
   userBranding.assets.socialImage ??
   userBranding.assets.logoContrast ??
   userBranding.assets.logo;
-const metadataBase = (() => {
-  try {
-    return new URL(env.NEXT_PUBLIC_APP_BASE_URL);
-  } catch {
-    return new URL("http://localhost:3000");
+
+function resolveMetadataBase(): URL {
+  const candidates = [
+    process.env.NEXT_PUBLIC_APP_BASE_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : undefined,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+    env.NEXT_PUBLIC_APP_BASE_URL,
+    "http://localhost:3000",
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    try {
+      return new URL(candidate);
+    } catch {
+      continue;
+    }
   }
-})();
+
+  return new URL("http://localhost:3000");
+}
+
+const metadataBase = resolveMetadataBase();
+const socialPreviewUrl = new URL(socialPreviewImage, metadataBase).toString();
 
 export const metadata: Metadata = {
   title: `${userBranding.displayName} | App Residentes`,
@@ -69,7 +88,7 @@ export const metadata: Metadata = {
     description: tenantBranding.platformDescription,
     images: [
       {
-        url: socialPreviewImage,
+        url: socialPreviewUrl,
         width: 512,
         height: 512,
         alt: `Imagen de ${userBranding.displayName}`,
@@ -82,7 +101,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${userBranding.displayName} | App Residentes`,
     description: tenantBranding.platformDescription,
-    images: [socialPreviewImage],
+    images: [socialPreviewUrl],
   },
   manifest: userBranding.assets.manifest,
 };
